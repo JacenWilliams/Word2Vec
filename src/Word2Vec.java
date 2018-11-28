@@ -9,13 +9,15 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 public class Word2Vec {
-
+	
+	private static final int SAMPLING_RATE = 10; //Determines the number of negative words trained for each training cycle
 	private static int windowSize = 5;
 	private static int vocabSize = 0;
 	private static int featureSize = 300;
-	private static HashMap<String, Integer> vocab = new HashMap<>();
+	private static HashMap<String, Word> vocab = new HashMap<>();
 	private static Network network;
 	private static ArrayList<File> files;
+	private static int[] unigramTable;
 	
 	public static void main(String[] args) {
 
@@ -29,6 +31,7 @@ public class Word2Vec {
 			if(items.length > 0) {
 				if(items[0].equals("loaddata")) {
 					loadTrainingData(items[1]);
+					fillUnigramTable();
 				} else if (items[0].equals("train")) {
 					train();
 				}
@@ -43,7 +46,7 @@ public class Word2Vec {
 		String line;
 		String[] window = new String[(windowSize * 2) + 1];
 		BufferedReader br = null;
-		network = new Network(vocabSize, featureSize);
+		network = new Network(vocabSize, featureSize, vocab, unigramTable, SAMPLING_RATE);
 		
 		try {
 			//load initial data window
@@ -141,7 +144,9 @@ public class Word2Vec {
 			
 			while((line = br.readLine()) != null) {
 				if(!vocab.containsKey(line)) {
-					vocab.put(line, index);
+					vocab.put(line, new Word(line, index));
+				} else {
+					vocab.get(line).count++;
 				}
 			}
 			
@@ -167,4 +172,29 @@ public class Word2Vec {
 			}
 		}
 	}
+	
+	
+	//*method to fill unigramTable*
+	//unigramTable is used to quickly select random words for Negative Sampling.
+	//unigramTable is initialized to 100000000 and each word is added to the table
+	//according to its weight. Weight is calculated as w^3/4. The table then stores
+	//the index of the word.
+	private static void fillUnigramTable() {
+		int count = 0;
+		int weight = 0;
+		unigramTable = new int[100000000];
+		
+		for(Word word : vocab.values()) {
+			weight = (int) Math.pow(word.count, (3/4));
+
+			for(int i = 0; i < weight; i++) {
+				if (count < 100000000) {
+					unigramTable[count] = word.index;
+					count++;
+				}
+			}
+		}
+	}
 }
+
+	

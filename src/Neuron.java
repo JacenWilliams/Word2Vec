@@ -1,14 +1,18 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Neuron {
 	public ArrayList<Connection> input;
-	public ArrayList<Connection> output;
+	public HashMap<Integer, Connection> directedOutput;
+	//public ArrayList<Connection> output;
 	public double totalInput = 0;
 	public double totalOutput = 0;
+	public double error = 0;
 	
 	public Neuron() {
-		this.input = new ArrayList<>();
-		this.output = new ArrayList<>();
+		input = new ArrayList<>();
+		//output = new ArrayList<>();
+		directedOutput = new HashMap<>();
 	}
 	
 	//calculates sigmoid activation function and assigns to totalOutput;
@@ -24,6 +28,18 @@ public class Neuron {
 			sum += con.calculateInput();
 		}
 		totalInput = sum;
+	}
+	
+	public void addOutput(Connection con, int index) {
+		//output.add(con);
+
+		directedOutput.put(index, con);
+
+		
+	}
+	
+	public double derivative() {
+		return totalOutput * (1 - totalOutput);
 	}
 	
 }
