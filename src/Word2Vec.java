@@ -10,7 +10,7 @@ import java.util.Scanner;
 
 public class Word2Vec {
 	
-	private static final int SAMPLING_RATE = 10; //Determines the number of negative words trained for each training cycle
+	private static final int SAMPLING_RATE = 10; //Determines the number of negative words trained for each training iteration
 	private static int windowSize = 5;
 	private static int vocabSize = 0;
 	private static int featureSize = 300;
@@ -38,15 +38,16 @@ public class Word2Vec {
 			}
 		}
 		
+		sc.close();
+		
 	}
 	
 	//function to read in data from previously loaded files and train network
 	private static void train() {
-		int docs = files.size();
 		String line;
 		String[] window = new String[(windowSize * 2) + 1];
 		BufferedReader br = null;
-		network = new Network(vocabSize, featureSize, vocab, unigramTable, SAMPLING_RATE);
+		network = new Network(vocabSize, featureSize, unigramTable, SAMPLING_RATE);
 		
 		try {
 			//load initial data window
@@ -158,9 +159,7 @@ public class Word2Vec {
 	}
 	
 	//utility function to expand directory and add all files contained to files arraylist
-	private static void listFiles(File dir) {
-		ArrayList<File> subdir;
-		
+	private static void listFiles(File dir) {		
 		File[] fList = dir.listFiles();
 		if(fList != null) {
 			for (File file : fList) {

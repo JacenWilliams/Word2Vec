@@ -1,24 +1,21 @@
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Network {
 	private ArrayList<Neuron> inputLayer;
 	private ArrayList<Neuron> hiddenLayer;
 	private ArrayList<Neuron> outputLayer;
 	
-	private HashMap<String, Word> vocab;
 	private int[] unigramTable;
 	private int samplingRate;
 	
 	private int inputSize;
 	private int featureSize;
-	private final double ALPHA = 0.2;
+	private final double ALPHA = 0.025;
 	
-	public Network(int input, int feature, HashMap<String, Word> vocab, int[] unigramTable, int samplingRate) {
+	public Network(int input, int feature, int[] unigramTable, int samplingRate) {
 		inputSize = input;
 		featureSize = feature;
 		
-		this.vocab = vocab;
 		this.unigramTable = unigramTable;
 		this.samplingRate = samplingRate;
 		
@@ -26,6 +23,7 @@ public class Network {
 		hiddenLayer = new ArrayList<>();
 		outputLayer = new ArrayList<>();
 		
+		//initialize input and output layer neurons
 		for(int i = 0; i < inputSize; i++) {
 			Neuron in = new Neuron();
 			Neuron out = new Neuron();
@@ -33,11 +31,13 @@ public class Network {
 			outputLayer.add(out);
 		}
 		
+		//initialize hidden layer neurons
 		for(int i = 0; i < featureSize; i++) {
 			Neuron f = new Neuron();
 			hiddenLayer.add(f);
 		}
 		
+		//initialize input to hidden layer connections
 		for(int i = 0; i < inputLayer.size(); i++) { 
 			Neuron from = inputLayer.get(i);
 			for(int j = 0; j < hiddenLayer.size(); j++) { 
@@ -48,6 +48,7 @@ public class Network {
 			}
 		}
 		
+		//initialize hidden to output layer connections
 		for(int i = 0; i < hiddenLayer.size(); i++) { 
 			Neuron from = hiddenLayer.get(i);
 			for(int j = 0; j < outputLayer.size(); j++) { 
@@ -110,7 +111,6 @@ public class Network {
 	
 	public void backPropagate(Word expected, double[] output, Neuron input) {
 		ArrayList<Integer> samples = sample(expected.index);
-		double delta = 0;
 		
 		//calculate weighted error for output layer
 		for(int sample : samples) {
@@ -197,6 +197,8 @@ public class Network {
 		return samples;
 	}
 	
+	
+	//converts weights from input layer to hidden to vector for specific input
 	public double[] getVector(Word input) {
 		double[] vec = new double[featureSize];
 		Neuron n = inputLayer.get(input.index);
@@ -208,5 +210,22 @@ public class Network {
 		}
 		
 		return vec;
+	}
+	
+	//converts weights from input layer to hidden layer to array of vectors for al inputs
+	public double[][] getVectors() {
+		double[][] vectors = new double[inputSize][featureSize];
+		Neuron n;
+		
+		for(int i = 0; i < inputSize; i++) {
+			n = inputLayer.get(i);
+			ArrayList<Connection> weights = (ArrayList<Connection>) n.directedOutput.values();
+			for (int j = 0; j < featureSize; j++) {
+				Connection con = weights.get(j);
+				vectors[i][j] = con.weight;
+			}
+		}
+		
+		return vectors;
 	}
 }
