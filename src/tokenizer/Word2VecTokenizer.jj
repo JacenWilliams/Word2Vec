@@ -1,0 +1,78 @@
+/**
+ * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
+ */
+options
+{
+  static = false;
+  UNICODE_INPUT = true;
+ // JAVA_UNICODE_ESCAPE = true;
+}
+
+PARSER_BEGIN(Word2VecTokenizer)
+package tokenizer;
+
+import java.io.*;
+
+public class Word2VecTokenizer
+{
+	public static void main(String args []) throws Exception { 
+		File inputdir =  new File(args[0]);
+    	String  outputdir = args[1];
+		File[] inputFiles = inputdir.listFiles();
+
+		for (File file : inputFiles) {
+	 
+		  	String fileString = file.toString();
+		  	fileString = fileString.replace("\\", "/");
+		    String[] splitFile = fileString.split("/");
+		    String outputFile = splitFile[splitFile.length - 1];
+		    
+			BufferedReader br = new BufferedReader(new FileReader(file));
+			FileWriter fw = new FileWriter(outputdir + File.separator + outputFile + ".out");
+	
+			Word2VecTokenizer u = new Word2VecTokenizer(br);
+	  		Token t;
+	  	
+	  		t = u.getNextToken();
+	  	
+	  		while ( t.kind != Word2VecTokenizerConstants.EOF ) {
+	  			fw.write(t.image + "\n");
+	  			t = u.getNextToken();
+			}
+			br.close();
+			fw.close();
+		}
+			System.out.println("Data successfully tokenized");
+	}
+}
+
+PARSER_END(Word2VecTokenizer)
+
+SKIP : {
+        < HTML           :"<"(~["<",">"])+">"  >
+|       < HTML_COMMENT	 :"<!--"(~["<",">"])+"-->" > 
+|       < WHITESPACE     :(["\r", " ", "\t", "\n"])+ >
+| 		< JS			 :"<script>"(~["<", ">"])+"</script>" >
+//|       < CODE_LINE      :(["\r", "\n"])+ (~[";","&","\r", "\n"])+ ";" >
+|       < CODE_BLOCK     :(["\r", "\n"])+(~["\r", "\n", "{","}"])+"{"(~["}"])+"}" >
+|       < BLOCK_COMMENT  :"/*"(~[])+"*/" >
+|       < LINE_COMMENT   :"//"(~[])+(["\r", "\n"])+ >
+|       < PUNCTUATION    :[".",",","?","!","{","}",":"] >
+|       < PRE_TAG        :"<pre>"(~[])+"</pre>" >
+|       < NUMBER         :(["0"-"9",",","."])+ >
+|       < HTML_ENTITIES  :"&"(["a"-"z","A"-"Z"])+";" >
+|       < EMAIL          :(["a"-"z","A"-"Z","0"-"9","."])*"@"(["a"-"z","A"-"Z","0"-"9","."])+"."(["A"-"Z","a"-"z"]){2,} >
+|       < PHONE          :(["("])?(["0"-"9"]){3}(")")?[" ","-"](["0"-"9"]){3}[" ","-"](["0"-"9"]){4} >
+|       < NOT_WORD       :~[] >
+
+}
+
+
+TOKEN : {
+
+        < WORD           :(["a"-"z","A"-"Z","'"])+ >
+
+}
+
+
+

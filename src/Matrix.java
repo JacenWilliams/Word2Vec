@@ -20,6 +20,36 @@ public final class Matrix {
 		return sum;
 	}
 	
+	public static double[] subtract(double[] a, double[] b ) {
+		if(a.length != b.length) {
+			System.out.println("Error: Invalid matrix operation");
+			return null;
+		}
+		
+		double[] c = new double[a.length];
+		
+		for(int i = 0; i < a.length; i++) {
+			c[i] = a[i] - b[i];
+		}
+		
+		return c;
+	}
+	
+	public static double[] add(double[] a, double[] b ) {
+		if(a.length != b.length) {
+			System.out.println("Error: Invalid matrix operation");
+			return null;
+		}
+		
+		double[] c = new double[a.length];
+		
+		for(int i = 0; i < a.length; i++) {
+			c[i] = a[i] + b[i];
+		}
+		
+		return c;
+	}
+	
 	public static double cosineDistance(double[] a, double[] b) {
 		double dot = dot(a, b);
 		double x = 0;
@@ -31,5 +61,12 @@ public final class Matrix {
 		}
 		
 		return 1 - (dot / ((Math.sqrt(x)) * (Math.sqrt(y))));
+	}
+	
+	public static void printVector(double[] a) {
+		for(int i = 0; i < a.length; i++) {
+			System.out.print("[" + a[i] + "] ");
+		}
+		System.out.print("\n");
 	}
 }

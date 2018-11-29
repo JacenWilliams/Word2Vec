@@ -17,7 +17,8 @@ public class Neuron {
 	
 	//calculates sigmoid activation function and assigns to totalOutput;
 	public void setOutput() {
-		totalOutput = 1/(1+(Math.exp(-totalInput)));
+		totalOutput = totalInput;
+		//System.out.println("Total input: " + totalInput + "\t | " + "Sigmoid: " + totalOutput);
 	}
 	
 	

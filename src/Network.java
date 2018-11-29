@@ -61,12 +61,23 @@ public class Network {
 	}
 	
 	public void train(Word input, Word expected) {
+		//double[] weights = getVector(input);
+		//System.out.println("Initial weights for " + input.value + " : Index - " + input.index);
+		//Matrix.printVector(weights);
+		
 		int[] oneHot = new int[inputSize];
 		oneHot[input.index] = 1;
-		
+		//System.out.println("Feedforward...");
 		double[] rawOutput = feedForward(oneHot);
 		double[] output = softmax(rawOutput);
+		//System.out.println("Initial Output: ");
+		//Matrix.printVector(output);
+		//System.out.println("Backpropagate...");
 		backPropagate(expected, output, inputLayer.get(input.index));
+		
+		//System.out.println("Changed weights for " + input.value);
+		//weights = getVector(input);
+		//Matrix.printVector(weights);
 	}
 	
 	public double[] feedForward(int[] input) {
@@ -74,7 +85,7 @@ public class Network {
 		
 		for(int i = 0; i < inputLayer.size(); i++) {
 			Neuron n = inputLayer.get(i);
-			n.totalInput = i;
+			n.totalInput = input[i];
 			n.setOutput();
 		}
 		
@@ -110,9 +121,11 @@ public class Network {
 	}
 	
 	public void backPropagate(Word expected, double[] output, Neuron input) {
+		//System.out.println("Sampling...");
 		ArrayList<Integer> samples = sample(expected.index);
 		
-		//calculate weighted error for output layer
+		//System.out.println("Calculating output layer error...");
+		//calculate error for output layer neurons
 		for(int sample : samples) {
 			Neuron out = outputLayer.get(sample);
 			double target = 0;
@@ -120,12 +133,14 @@ public class Network {
 				target = 1;
 			}
 			
-			//weighted error is calculated as absolute error * derivative of sigmoid function
-			out.error = specificError(target, output[sample]) * out.derivative();
+			
+			out.error = specificError(target, output[sample]);
 			
 		}
 		
-		//calculate weighted error for hidden layer
+		//System.out.println("Calculating hidden layer error...");
+
+		//calculate error for hidden layer
 		for(int i = 0; i < hiddenLayer.size(); i++) {
 			Neuron hidden = hiddenLayer.get(i);
 			double sum = 0;
@@ -134,9 +149,11 @@ public class Network {
 				sum += con.weight * con.to.error;
 			}
 			
-			hidden.error = sum * hidden.derivative();
+			hidden.error = sum;
 		}
 		
+		//System.out.println("Calculating output layer weights...");
+
 		//update weights for hidden layer to output layer
 		for(int sample : samples) {
 			Neuron out = outputLayer.get(sample);
@@ -145,6 +162,8 @@ public class Network {
 			}
 		}
 		
+		//System.out.println("Calculating hidden layer weights...");
+
 		//update weights for input layer to hidden layer
 		for(Connection con : input.directedOutput.values()) {
 			con.weight = con.weight - (ALPHA * con.from.totalOutput * con.to.error);
@@ -152,46 +171,24 @@ public class Network {
 		
 	}
 	
-	//calculate squared error for single output
+	//calculate error for single output
 	public double specificError(double expected, double output) {
 		//return .5 * Math.pow(expected - output, 2);
-		return expected - output;
+		return output - expected;
 	}
 	
-	//calculate total squared sum error for all outputs
-	public double totalError(Word expected, double[] output) {
-		double total = 0;
-		double error = 0;
-		int value = 0;
-		
-		for(int i = 0; i < output.length; i++) {
-			if(expected.index == i) {
-				value = 1;
-			} else {
-				value = 0;
-			}
-			
-			error = (1/2) * (Math.pow(value - output[i], 2));
-			total += error;
-		}
-		
-		return total;
-	}
+
 	
 	//returns an arraylist containing indexes of randomly selected words using unigramTable
 	//correct index is supplied to ensure it is not selected;
 	public ArrayList<Integer> sample(int correctIndex) {
 		ArrayList<Integer> samples = new ArrayList<Integer>();
 		int index = 0;
-		
+		//System.out.println(samples.size() + " : " + samplingRate);
 		for(int i = 0; i < samplingRate; i++) {
 			index =(int) Math.random() * 100000000;
-			
-			if(unigramTable[index] == correctIndex) {
-				i--;
-			} else {
-				samples.add(unigramTable[index]);
-			}
+			//System.out.println(i + " : " + index);
+			samples.add(unigramTable[index]);
 		}
 		
 		return samples;
@@ -202,7 +199,7 @@ public class Network {
 	public double[] getVector(Word input) {
 		double[] vec = new double[featureSize];
 		Neuron n = inputLayer.get(input.index);
-		ArrayList<Connection> weights = (ArrayList<Connection>) n.directedOutput.values();
+		ArrayList<Connection> weights = new ArrayList<>(n.directedOutput.values());
 		
 		for(int i = 0; i < featureSize; i++) {
 			Connection con = weights.get(i);
@@ -219,7 +216,7 @@ public class Network {
 		
 		for(int i = 0; i < inputSize; i++) {
 			n = inputLayer.get(i);
-			ArrayList<Connection> weights = (ArrayList<Connection>) n.directedOutput.values();
+			ArrayList<Connection> weights = new ArrayList<>(n.directedOutput.values());
 			for (int j = 0; j < featureSize; j++) {
 				Connection con = weights.get(j);
 				vectors[i][j] = con.weight;
