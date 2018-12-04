@@ -100,7 +100,6 @@ public class Word2Vec {
 		BufferedReader br = null;
 		
 		if(counter % percentTotal >= 1) {
-			System.out.println("Percent Complete: " + records/totalCounter);
 			counter = 0;
 		}
 
@@ -117,8 +116,10 @@ public class Word2Vec {
 				//printWindow(window);
 				if(window[i] != null && window[windowSize] != null) {
 					network.train(vocab.get(window[i]), vocab.get(window[windowSize]));
-					//System.out.println("Training " + counter + " of " + records * windowSize * 2 + " | " + window[i] + " and " + window[windowSize]);
-					//counter++;
+					if(counter % 1000 == 0) {
+						System.out.println("Training " + counter + " of " + records * windowSize * 2);
+					}
+					counter++;
 					//totalCounter++;
 					
 				}
@@ -134,7 +135,10 @@ public class Word2Vec {
 					if(window[i] != null && window[windowSize] != null) {
 						network.train(vocab.get(window[i]), vocab.get(window[windowSize]));
 						//System.out.println("Training " + counter + " of " + records * windowSize * 2 + " | " + window[i] + " and " + window[windowSize]);
-						//counter++;
+						if(counter % 1000 == 0) {
+							System.out.println("Training " + counter + " of " + records * windowSize * 2);
+						}
+						counter++;
 						//totalCounter++;
 					}
 				}
@@ -143,7 +147,10 @@ public class Word2Vec {
 					if(window[i] != null && window[windowSize] != null) {
 						network.train(vocab.get(window[i]), vocab.get(window[windowSize]));
 						//System.out.println("Training " + counter + " of " + records * windowSize * 2 + " | " + window[i] + " and " + window[windowSize]);
-						//counter++;
+						if(counter % 1000 == 0) {
+							System.out.println("Training " + counter + " of " + records * windowSize * 2);
+						}
+						counter++;
 						//totalCounter++;
 					}
 				}

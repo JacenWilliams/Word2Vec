@@ -60,24 +60,14 @@ public class Network {
 		}
 	}
 	
-	public void train(Word input, Word expected) {
-		//double[] weights = getVector(input);
-		//System.out.println("Initial weights for " + input.value + " : Index - " + input.index);
-		//Matrix.printVector(weights);
+	public void train(Word input, Word expected)  {
 		
 		int[] oneHot = new int[inputSize];
 		oneHot[input.index] = 1;
-		//System.out.println("Feedforward...");
 		double[] rawOutput = feedForward(oneHot);
 		double[] output = softmax(rawOutput);
-		//System.out.println("Initial Output: ");
-		//Matrix.printVector(output);
-		//System.out.println("Backpropagate...");
 		backPropagate(expected, output, inputLayer.get(input.index));
 		
-		//System.out.println("Changed weights for " + input.value);
-		//weights = getVector(input);
-		//Matrix.printVector(weights);
 	}
 	
 	public double[] feedForward(int[] input) {
