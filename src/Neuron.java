@@ -11,14 +11,12 @@ public class Neuron {
 	
 	public Neuron() {
 		input = new ArrayList<>();
-		//output = new ArrayList<>();
 		directedOutput = new HashMap<>();
 	}
 	
 	//calculates sigmoid activation function and assigns to totalOutput;
 	public void setOutput() {
 		totalOutput = totalInput;
-		//System.out.println("Total input: " + totalInput + "\t | " + "Sigmoid: " + totalOutput);
 	}
 	
 	
@@ -32,11 +30,7 @@ public class Neuron {
 	}
 	
 	public void addOutput(Connection con, int index) {
-		//output.add(con);
-
 		directedOutput.put(index, con);
-
-		
 	}
 	
 	public double derivative() {

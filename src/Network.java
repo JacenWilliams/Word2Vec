@@ -111,10 +111,8 @@ public class Network {
 	}
 	
 	public void backPropagate(Word expected, double[] output, Neuron input) {
-		//System.out.println("Sampling...");
 		ArrayList<Integer> samples = sample(expected.index);
 		
-		//System.out.println("Calculating output layer error...");
 		//calculate error for output layer neurons
 		for(int sample : samples) {
 			Neuron out = outputLayer.get(sample);
@@ -127,8 +125,6 @@ public class Network {
 			out.error = specificError(target, output[sample]);
 			
 		}
-		
-		//System.out.println("Calculating hidden layer error...");
 
 		//calculate error for hidden layer
 		for(int i = 0; i < hiddenLayer.size(); i++) {
@@ -142,8 +138,6 @@ public class Network {
 			hidden.error = sum;
 		}
 		
-		//System.out.println("Calculating output layer weights...");
-
 		//update weights for hidden layer to output layer
 		for(int sample : samples) {
 			Neuron out = outputLayer.get(sample);
@@ -152,8 +146,6 @@ public class Network {
 			}
 		}
 		
-		//System.out.println("Calculating hidden layer weights...");
-
 		//update weights for input layer to hidden layer
 		for(Connection con : input.directedOutput.values()) {
 			con.weight = con.weight - (ALPHA * con.from.totalOutput * con.to.error);
