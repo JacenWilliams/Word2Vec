@@ -5,14 +5,14 @@ public class Network {
 	private ArrayList<Neuron> hiddenLayer;
 	private ArrayList<Neuron> outputLayer;
 	
-	private int[] unigramTable;
+	private ArrayList<Integer> unigramTable;
 	private int samplingRate;
 	
 	private int inputSize;
 	private int featureSize;
 	private final double ALPHA = 0.025;
 	
-	public Network(int input, int feature, int[] unigramTable, int samplingRate) {
+	public Network(int input, int feature, ArrayList<Integer> unigramTable, int samplingRate) {
 		inputSize = input;
 		featureSize = feature;
 		
@@ -174,11 +174,9 @@ public class Network {
 	public ArrayList<Integer> sample(int correctIndex) {
 		ArrayList<Integer> samples = new ArrayList<Integer>();
 		int index = 0;
-		//System.out.println(samples.size() + " : " + samplingRate);
 		for(int i = 0; i < samplingRate; i++) {
-			index =(int) Math.random() * 100000000;
-			//System.out.println(i + " : " + index);
-			samples.add(unigramTable[index]);
+			index =(int) Math.random() * unigramTable.size();
+			samples.add(unigramTable.get(index));
 		}
 		
 		return samples;

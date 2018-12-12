@@ -9,18 +9,18 @@ import java.util.Scanner;
 
 public class Word2Vec {
 	
-	private static final int SAMPLING_RATE = 10; //Determines the number of negative words trained for each training iteration
-	private static int windowSize = 3;
-	private static int vocabSize = 0;
-	private static int featureSize = 50;
+	private static final int SAMPLING_RATE     = 10; //Determines the number of negative words trained for each training iteration
+	private static int windowSize              = 3;
+	private static int vocabSize               = 0;
+	private static int featureSize             = 50;
+	private static long records                = 0;
+	private static long counter                = 0;
+	private static long totalCounter           = 0;
+	private static double percentTotal         = 0;
 	private static HashMap<String, Word> vocab = new HashMap<>();
 	private static Network network;
 	private static ArrayList<File> files;
-	private static int[] unigramTable;
-	private static long records = 0;
-	private static long counter = 0;
-	private static long totalCounter = 0;
-	private static double percentTotal = 0;
+	private static ArrayList<Integer> unigramTable;
 	
 	public static void main(String[] args) {
 		System.out.println(" _       ______  ____  ____ ___ _    ______________\r\n" + 
@@ -68,9 +68,18 @@ public class Word2Vec {
 					}
 				} else if(items[0].equals("closest")) {
 					if(items.length == 4) {
-						closestDistance(items[1], items[2], items[3]);
+						String minWord = closestDistance(items[1], items[2], items[3]);
+						if(minWord != null) {
+							System.out.println(items[0] + " : " + items[1] + " | " + items[3] + " : " + minWord);
+						}
 					} else {
 						System.out.println("Invalid Input");
+					}
+				} else if(items[0].equals("test")) {
+					if(items.length == 2) {
+						test(items[1]);
+					} else {
+						System.out.println("Invalid input");
 					}
 				}
 			}
@@ -243,14 +252,14 @@ public class Word2Vec {
 	private static void fillUnigramTable() {
 		int count = 0;
 		int weight = 0;
-		unigramTable = new int[100000000];
+		unigramTable = new ArrayList<>();
 		
 		for(Word word : vocab.values()) {
 			weight = (int) Math.pow(word.count, (3/4));
 
 			for(int i = 0; i < weight; i++) {
 				if (count < 100000000) {
-					unigramTable[count] = word.index;
+					unigramTable.add(word.index);
 					count++;
 				}
 			}
@@ -292,20 +301,20 @@ public class Word2Vec {
 		
 	}
 	
-	private static void closestDistance(String a, String b, String c) {
+	private static String closestDistance(String a, String b, String c) {
 		if(!vocab.containsKey(a)) {
 			System.out.println("Error: " + a + " not in vocabulary");
-			return;
+			return null;
 		}
 		
 		if(!vocab.containsKey(b)) {
 			System.out.println("Error: " + b + " not in vocabulary");
-			return;
+			return null;
 		}
 		
 		if(!vocab.containsKey(c)) {
 			System.out.println("Error: " + b + " not in vocabulary");
-			return;
+			return null;
 		}
 		
 		Word word1 = vocab.get(a);
@@ -332,7 +341,69 @@ public class Word2Vec {
 				
 		}
 		
-		System.out.println(a + " : " + b + " | " + c + " : " + minWord.value);
+		return minWord.value;
+	}
+	
+	private static void test(String filename) {
+		File file = new File(filename);
+		
+		if(!file.exists()) {
+			System.out.println("File not found");
+			return;
+		}
+		
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(file));
+			double accuracy   = 0;
+			int total         = 0;
+			int correct       = 0;
+			String line;
+			String[] items;
+			String a;
+			String b;
+			String c;
+			String guess;
+			String target;
+			
+			while((line = br.readLine()) != null) {
+				items = line.split(",");
+				
+				if(items.length != 4) {
+					System.out.println("Invalid input file");
+					return;
+				}
+				
+				a      = items[0];
+				b      = items[1];
+				c      = items[2];
+				target = items[3];
+				
+				guess = closestDistance(a, b, c);
+				
+				total++;
+				if(guess.equals(target)) {
+					correct++;
+				}
+			}
+			
+			accuracy = (total - correct) / total;
+			
+			System.out.println("Total Tests: " + total);
+			System.out.println("Total Correct: " + correct);
+			System.out.println("Accuracy: " + total + "%");
+
+			
+		} catch(Exception ex) {
+			System.out.println("Invalid input file");
+			return;
+		}
+		
 	}
 	
 }
+
+
+
+
+
+
