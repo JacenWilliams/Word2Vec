@@ -10,18 +10,18 @@ import java.util.Scanner;
 public class Word2Vec {
 	
 	private static final int SAMPLING_RATE     = 10; //Determines the number of negative words trained for each training iteration
-	private static int windowSize              = 3;
-	private static int vocabSize               = 0;
-	private static int featureSize             = 50;
-	private static long records                = 0;
-	private static long cycles                 = 0;
+	private static int windowSize              = 3;  //Context window size used for training
+	private static int vocabSize               = 0;  
+	private static int featureSize             = 50; //vector size, determines number of hidden layer nodes
+	private static long records                = 0;  //total records in input file
+	private static long cycles                 = 0;  //training cycles required for 1 epoch of current loaded data
 	private static long counter                = 0;
 	private static double percentTotal         = 0;
 	private static boolean ready               = false;
 	private static HashMap<String, Word> vocab = new HashMap<>();
 	private static Network network;
 	private static ArrayList<File> files;
-	private static ArrayList<Integer> unigramTable;
+	private static ArrayList<Integer> unigramTable; //table used to create unigram distribution for negative sampling
 	
 	public static void main(String[] args) {
 		System.out.println(" _       ______  ____  ____ ___ _    ______________\r\n" + 
@@ -99,6 +99,17 @@ public class Word2Vec {
 				} else if(items[0].equals("size")) {
 					System.out.println("Vocabulary Size: " + vocabSize);
 					System.out.println("Tokens: " + records);
+				} else if(items[0].equals("help")) {
+					System.out.println("Commands:");
+					System.out.println("loaddata (input directory)");
+					System.out.println("train");
+					System.out.println("list     (word)");
+					System.out.println("listall");
+					System.out.println("distance (word1) (word2)");
+					System.out.println("closest  (word1) (word2) (word3)");
+					System.out.println("test     (filename)");
+
+					
 				}
 			}
 			System.out.print("WORD2VEC: ");
@@ -145,7 +156,7 @@ public class Word2Vec {
 				if(window[i] != null && window[windowSize] != null) {
 					network.train(vocab.get(window[i]), vocab.get(window[windowSize]));
 					if(counter % 1000 == 0) {
-						System.out.println("Training " + counter + " of " + records * windowSize * 2);
+						System.out.println("Training " + counter + " of " + cycles);
 					}
 					counter++;
 					//totalCounter++;
@@ -163,7 +174,7 @@ public class Word2Vec {
 					if(window[i] != null && window[windowSize] != null) {
 						network.train(vocab.get(window[i]), vocab.get(window[windowSize]));
 						if(counter % 1000 == 0) {
-							System.out.println("Training " + counter + " of " + records * windowSize * 2);
+							System.out.println("Training " + counter + " of " + cycles);
 						}
 						counter++;
 					}
@@ -173,7 +184,7 @@ public class Word2Vec {
 					if(window[i] != null && window[windowSize] != null) {
 						network.train(vocab.get(window[i]), vocab.get(window[windowSize]));
 						if(counter % 1000 == 0) {
-							System.out.println("Training " + counter + " of " + records * windowSize * 2);
+							System.out.println("Training " + counter + " of " + cycles);
 						}
 						counter++;
 					}
