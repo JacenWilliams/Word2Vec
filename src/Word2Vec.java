@@ -417,10 +417,11 @@ public class Word2Vec {
 				target = items[3];
 				
 				guess = closestDistance(a, b, c);
-				
-				total++;
-				if(guess.equals(target)) {
-					correct++;
+				if(vocab.containsKey(target) && guess != null) {
+					total++;
+					if(guess.equals(target)) {
+						correct++;
+					}
 				}
 			}
 			
