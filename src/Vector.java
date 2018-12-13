@@ -1,6 +1,6 @@
-public final class Matrix {
+public final class Vector {
 	
-	private Matrix() {
+	private Vector() {
 		
 	}
 	

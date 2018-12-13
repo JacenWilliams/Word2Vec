@@ -9,18 +9,19 @@ import java.util.Scanner;
 
 public class Word2Vec {
 	
-	private static final int SAMPLING_RATE = 10; //Determines the number of negative words trained for each training iteration
-	private static int windowSize = 3;
-	private static int vocabSize = 0;
-	private static int featureSize = 50;
+	private static final int SAMPLING_RATE     = 10; //Determines the number of negative words trained for each training iteration
+	private static int windowSize              = 3;  //Context window size used for training
+	private static int vocabSize               = 0;  
+	private static int featureSize             = 50; //vector size, determines number of hidden layer nodes
+	private static long records                = 0;  //total records in input file
+	private static long cycles                 = 0;  //training cycles required for 1 epoch of current loaded data
+	private static long counter                = 0;
+	private static double percentTotal         = 0;
+	private static boolean ready               = false;
 	private static HashMap<String, Word> vocab = new HashMap<>();
 	private static Network network;
 	private static ArrayList<File> files;
-	private static int[] unigramTable;
-	private static long records = 0;
-	private static long counter = 0;
-	private static long totalCounter = 0;
-	private static double percentTotal = 0;
+	private static ArrayList<Integer> unigramTable; //table used to create unigram distribution for negative sampling
 	
 	public static void main(String[] args) {
 		System.out.println(" _       ______  ____  ____ ___ _    ______________\r\n" + 
@@ -43,21 +44,35 @@ public class Word2Vec {
 		String[] items;
 		System.out.print("WORD2VEC: ");
 
+		//Main control loop
 		while(!(line = sc.nextLine()).equals("exit")) {
 			items = line.split("\\s+");
 
 			if(items.length > 0) {
 				if(items[0].equals("loaddata")) {
-					loadTrainingData(items[1]);
-					fillUnigramTable();
-					System.out.println("Data loaded");
-					System.out.println("Vocabulary Size: " + vocabSize);
-					System.out.println("Tokens: " + records);
+					if(items.length == 2) {
+						loadTrainingData(items[1]);
+						fillUnigramTable();
+						System.out.println("Data loaded");
+						System.out.println("Vocabulary Size: " + vocabSize);
+						System.out.println("Tokens: " + records);
+						ready = true;
+					} else {
+						System.out.println("Invalid Input");
+					}
 				} else if (items[0].equals("train")) {
-					train();
-					System.out.println("Training Complete");
+					if(ready) {
+						train();
+						System.out.println("Training Complete");
+					} else {
+						System.out.println("Error: No training data. Please use \"loaddata\" command first");
+					}
 				} else if (items[0].equals("list")) {
-					listVector(items[1]);
+					if(items.length == 2) {
+						listVector(items[1]);
+					} else {
+						System.out.println("Invalid Input");
+					}
 				} else if (items[0].equals("listall")) {
 					listAllVectors();
 				} else if (items[0].equals("distance")) {
@@ -68,17 +83,41 @@ public class Word2Vec {
 					}
 				} else if(items[0].equals("closest")) {
 					if(items.length == 4) {
-						closestDistance(items[1], items[2], items[3]);
+						String minWord = closestDistance(items[1], items[2], items[3]);
+						if(minWord != null) {
+							System.out.println(items[0] + " : " + items[1] + " | " + items[3] + " : " + minWord);
+						}
 					} else {
 						System.out.println("Invalid Input");
 					}
+				} else if(items[0].equals("test")) {
+					if(items.length == 2) {
+						test(items[1]);
+					} else {
+						System.out.println("Invalid input");
+					}
+				} else if(items[0].equals("size")) {
+					System.out.println("Vocabulary Size: " + vocabSize);
+					System.out.println("Tokens: " + records);
+				} else if(items[0].equals("help")) {
+					System.out.println("Commands:");
+					System.out.println("loaddata (input directory)");
+					System.out.println("train");
+					System.out.println("list     (word)");
+					System.out.println("listall");
+					System.out.println("distance (word1) (word2)");
+					System.out.println("closest  (word1) (word2) (word3)");
+					System.out.println("test     (filename)");
+
+					
 				}
 			}
 			System.out.print("WORD2VEC: ");
 
 		}
-		
+		System.out.println("Goodbye");
 		sc.close();
+		System.exit(0);
 		
 	}
 	
@@ -117,7 +156,7 @@ public class Word2Vec {
 				if(window[i] != null && window[windowSize] != null) {
 					network.train(vocab.get(window[i]), vocab.get(window[windowSize]));
 					if(counter % 1000 == 0) {
-						System.out.println("Training " + counter + " of " + records * windowSize * 2);
+						System.out.println("Training " + counter + " of " + cycles);
 					}
 					counter++;
 					//totalCounter++;
@@ -134,24 +173,20 @@ public class Word2Vec {
 				for(int i = 0; i < windowSize; i++) {
 					if(window[i] != null && window[windowSize] != null) {
 						network.train(vocab.get(window[i]), vocab.get(window[windowSize]));
-						//System.out.println("Training " + counter + " of " + records * windowSize * 2 + " | " + window[i] + " and " + window[windowSize]);
 						if(counter % 1000 == 0) {
-							System.out.println("Training " + counter + " of " + records * windowSize * 2);
+							System.out.println("Training " + counter + " of " + cycles);
 						}
 						counter++;
-						//totalCounter++;
 					}
 				}
 				
 				for (int i = windowSize + 1; i < window.length; i++) {
 					if(window[i] != null && window[windowSize] != null) {
 						network.train(vocab.get(window[i]), vocab.get(window[windowSize]));
-						//System.out.println("Training " + counter + " of " + records * windowSize * 2 + " | " + window[i] + " and " + window[windowSize]);
 						if(counter % 1000 == 0) {
-							System.out.println("Training " + counter + " of " + records * windowSize * 2);
+							System.out.println("Training " + counter + " of " + cycles);
 						}
 						counter++;
-						//totalCounter++;
 					}
 				}
 				
@@ -183,7 +218,6 @@ public class Word2Vec {
 		files = new ArrayList<File>();
 		listFiles(dir);
 		counter = 0;
-		totalCounter = 0;
 		System.out.println("Loading Training Data: ");
 		
 		for( File file : files) {
@@ -193,6 +227,18 @@ public class Word2Vec {
 		
 		vocabSize = vocab.size();
 		percentTotal = records / 100;
+		getCycles();
+	}
+	
+	private static void getCycles() {
+		long total = 0;
+		total = (records * (windowSize * 2)) - (windowSize * 2);
+		
+		for(int i = windowSize; i >= 0; i--) {
+			total += 2 * (windowSize + i);
+		}
+		
+		cycles = total;
 	}
 	
 	//utility function to add line of data to vocabulary
@@ -243,14 +289,14 @@ public class Word2Vec {
 	private static void fillUnigramTable() {
 		int count = 0;
 		int weight = 0;
-		unigramTable = new int[100000000];
+		unigramTable = new ArrayList<>();
 		
 		for(Word word : vocab.values()) {
 			weight = (int) Math.pow(word.count, (3/4));
 
 			for(int i = 0; i < weight; i++) {
 				if (count < 100000000) {
-					unigramTable[count] = word.index;
+					unigramTable.add(word.index);
 					count++;
 				}
 			}
@@ -267,7 +313,7 @@ public class Word2Vec {
 		
 		Word key = vocab.get(word);
 		double[] vector = network.getVector(key);
-		Matrix.printVector(vector);
+		Vector.printVector(vector);
 	}
 	
 	private static void listAllVectors() {
@@ -287,25 +333,25 @@ public class Word2Vec {
 			return;
 		}
 		
-		System.out.println(Matrix.cosineDistance(network.getVector(vocab.get(a)), network.getVector(vocab.get(b))));
+		System.out.println(Vector.cosineDistance(network.getVector(vocab.get(a)), network.getVector(vocab.get(b))));
 		
 		
 	}
 	
-	private static void closestDistance(String a, String b, String c) {
+	private static String closestDistance(String a, String b, String c) {
 		if(!vocab.containsKey(a)) {
 			System.out.println("Error: " + a + " not in vocabulary");
-			return;
+			return null;
 		}
 		
 		if(!vocab.containsKey(b)) {
 			System.out.println("Error: " + b + " not in vocabulary");
-			return;
+			return null;
 		}
 		
 		if(!vocab.containsKey(c)) {
 			System.out.println("Error: " + b + " not in vocabulary");
-			return;
+			return null;
 		}
 		
 		Word word1 = vocab.get(a);
@@ -316,23 +362,89 @@ public class Word2Vec {
 		double[] bVec = network.getVector(word2);
 		double[] cVec = network.getVector(word3);
 		
-		double[] comp = Matrix.subtract(aVec, bVec);
-		comp = Matrix.add(comp, cVec);
+		double[] comp = Vector.subtract(aVec, bVec);
+		comp = Vector.add(comp, cVec);
 		
 		Word minWord = null;
 		double minValue = Double.MAX_VALUE;
 		
 		for(Word word : vocab.values()) {
 			double[] wordVec = network.getVector(word);
-			if(Matrix.cosineDistance(comp, wordVec) < minValue && word.index != word1.index
+			if(Vector.cosineDistance(comp, wordVec) < minValue && word.index != word1.index
 					&& word.index != word2.index && word.index != word3.index) {
-				minValue = Matrix.cosineDistance(comp, wordVec);
+				minValue = Vector.cosineDistance(comp, wordVec);
 				minWord = word;
 			}
 				
 		}
 		
-		System.out.println(a + " : " + b + " | " + c + " : " + minWord.value);
+		return minWord.value;
+	}
+	
+	private static void test(String filename) {
+		File file = new File(filename);
+		
+		if(!file.exists()) {
+			System.out.println("File not found");
+			return;
+		}
+		
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(file));
+			double accuracy   = 0;
+			int total         = 0;
+			int correct       = 0;
+			String line;
+			String[] items;
+			String a;
+			String b;
+			String c;
+			String guess;
+			String target;
+			
+			while((line = br.readLine()) != null) {
+				items = line.split(",");
+				
+				if(items.length != 4) {
+					System.out.println("Invalid input file");
+					br.close();
+					return;
+				}
+				
+				a      = items[0];
+				b      = items[1];
+				c      = items[2];
+				target = items[3];
+				
+				guess = closestDistance(a, b, c);
+				if(vocab.containsKey(target) && guess != null) {
+					total++;
+					if(guess.equals(target)) {
+						correct++;
+					}
+				}
+			}
+			
+			accuracy = (total - correct) / total;
+			
+			System.out.println("Total Tests: " + total);
+			System.out.println("Total Correct: " + correct);
+			System.out.println("Accuracy: " + accuracy + "%");
+			
+			br.close();
+
+			
+		} catch(Exception ex) {
+			System.out.println("Invalid input file");
+			return;
+		}
+		
 	}
 	
 }
+
+
+
+
+
+
