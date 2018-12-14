@@ -1,0 +1,146 @@
+\begin{thebibliography}{}
+
+\bibitem [\protect \citeauthoryear {%
+Bengio%
+, Ducharme%
+, Vincent%
+\BCBL {}\ \BBA {} Jauvin%
+}{%
+Bengio%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2003}}%
+}]{%
+neural}
+\APACinsertmetastar {%
+neural}%
+\begin{APACrefauthors}%
+Bengio, Y.%
+, Ducharme, R.%
+, Vincent, P.%
+\BCBL {}\ \BBA {} Jauvin, C.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2003}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {A neural probabilistic language model} {A neural
+  probabilistic language model}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{Journal of machine learning
+  research}{3}{Feb}{1137--1155}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Goldberg%
+\ \BBA {} Levy%
+}{%
+Goldberg%
+\ \BBA {} Levy%
+}{%
+{\protect \APACyear {2014}}%
+}]{%
+explained}
+\APACinsertmetastar {%
+explained}%
+\begin{APACrefauthors}%
+Goldberg, Y.%
+\BCBT {}\ \BBA {} Levy, O.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2014}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {word2vec Explained: deriving Mikolov et al.'s
+  negative-sampling word-embedding method} {word2vec explained: deriving
+  mikolov et al.'s negative-sampling word-embedding method}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{arXiv preprint arXiv:1402.3722}{}{}{}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Mikolov%
+, Chen%
+, Corrado%
+\BCBL {}\ \BBA {} Dean%
+}{%
+Mikolov%
+, Chen%
+\BCBL {}\ \protect \BOthers {.}}{%
+{\protect \APACyear {2013}}%
+}]{%
+efficient}
+\APACinsertmetastar {%
+efficient}%
+\begin{APACrefauthors}%
+Mikolov, T.%
+, Chen, K.%
+, Corrado, G.%
+\BCBL {}\ \BBA {} Dean, J.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2013}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Efficient estimation of word representations in vector
+  space} {Efficient estimation of word representations in vector space}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{arXiv preprint arXiv:1301.3781}{}{}{}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Mikolov%
+, Sutskever%
+, Chen%
+, Corrado%
+\BCBL {}\ \BBA {} Dean%
+}{%
+Mikolov%
+, Sutskever%
+\BCBL {}\ \protect \BOthers {.}}{%
+{\protect \APACyear {2013}}%
+}]{%
+distributed}
+\APACinsertmetastar {%
+distributed}%
+\begin{APACrefauthors}%
+Mikolov, T.%
+, Sutskever, I.%
+, Chen, K.%
+, Corrado, G\BPBI S.%
+\BCBL {}\ \BBA {} Dean, J.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2013}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Distributed Representations of Words and Phrases and
+  their Compositionality} {Distributed representations of words and phrases and
+  their compositionality}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{}{}{}{3111--3119}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Rong%
+}{%
+Rong%
+}{%
+{\protect \APACyear {2014}}%
+}]{%
+parameter}
+\APACinsertmetastar {%
+parameter}%
+\begin{APACrefauthors}%
+Rong, X.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2014}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {word2vec parameter learning explained} {word2vec
+  parameter learning explained}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{arXiv preprint arXiv:1411.2738}{}{}{}.
+\PrintBackRefs{\CurrentBib}
+
+\end{thebibliography}
